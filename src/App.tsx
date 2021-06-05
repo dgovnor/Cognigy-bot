@@ -1,26 +1,42 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { FC, useEffect, useState } from 'react';
+import {  useDispatch, useSelector } from 'react-redux';
 import './App.css';
+// import { sendMessage } from './redux/actions';
+import {Header} from './component/header'
+import { Main } from './component/main'
+import client from './services/sockets'
 
-function App() {
+
+ export const App = ({addTodo}:any) => {
+   useEffect(() => {
+    
+     client.connect().then(response => {
+      client.sendMessage('hellowrod')
+    });
+    
+    
+  }, []);
+   const messageInfo = useSelector((state) => state);
+   console.log('na we',messageInfo)
+  const dispatch = useDispatch()
+  const [message, setMessage] = useState('')
+  const handleAddMessage = (e: { preventDefault: () => void; }) => {
+   dispatch({type: 'SEND_MESSAGE', payload: {content:message}})
+    setMessage('')
+    e.preventDefault()
+  }
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <div className="msger">
+      
+    <Header/>
+      
+    <Main/>
+      <form className="msger-inputarea">
+        <input type="text" className="msger-input" onChange={(e) => setMessage(e.target.value)} value={message} placeholder="Enter your message..."/>
+        <button onClick={handleAddMessage} className="msger-send-btn">Send</button>
+      </form>
+</div>
   );
 }
 
-export default App;
+export default App
